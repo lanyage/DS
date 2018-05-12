@@ -14,7 +14,7 @@ public class Fibonacci {
         long first = 1; //用来维护第一个值
         long second = 1; //用来维护第二个值
         System.out.println(first + "-" + second);
-        while (n-- > 2) {
+        while (n-- > 1) {
             second += first;
             first = second - first;
             System.out.println(first + "-" + second);
