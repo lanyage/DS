@@ -97,4 +97,20 @@ class VectorSort {
             a[j] = temp[i++];
         }
     }
+    /**
+     * 选择排序 能够确定比较的次数,每次把最大的元素放到最后面
+     * @param a
+     * @param r
+     * @return
+     */
+    public int selectMax(int[] a, int r) {
+        int max = 0;
+        for (int i = 0; i < r; i++) {
+            max = a[max] < a[i] ? i : max;
+        }
+        return max;
+    }
+    /**
+    *插入排序的思想就是从后往前比较,如果比前面的元素要大或者前面的元素是哨兵指针,那么就直接插在节点后面
+    */
 }
