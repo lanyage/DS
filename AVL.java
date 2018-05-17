@@ -89,7 +89,6 @@ class BTSNode {
      */
     public void giveParentTo(BTSNode node) {
         BTSNode parent = this.getParent();
-        this.setParent(null);
         node.setParent(parent);
     }
 
@@ -130,14 +129,6 @@ class AVL {
         root = new BTSNode(rootLoad, true);
         root.setParent(genesis);
         size++;
-    }
-
-    public BTSNode getGenesis() {
-        return genesis;
-    }
-
-    public void setGenesis(BTSNode genesis) {
-        this.genesis = genesis;
     }
 
     public BTSNode getRoot() {
@@ -191,11 +182,11 @@ class AVL {
     /**
      * 插入新节点,插入完成后要根据树的结构进行重构,遍历hot的所有的父节点,看是否有存在不平衡的情况,如果有就用3+4重构
      */
-    public void insert(int key) {
+    public BTSNode insert(int key) {
         BTSNode x = search(key);
         int xData = x.getData();
+        BTSNode add = null;
         if (key != xData) {
-            BTSNode add;
             if (key < xData) {
                 add = new BTSNode(key);
                 add.setParent(x);
@@ -219,6 +210,69 @@ class AVL {
             }
             size++;
         }
+        return add == null ? null : add;
+    }
+
+    public void remove(int key) {
+        BTSNode x = search(key);
+        BTSNode hot = null;
+        if (key == x.getData()) {
+            hot = removeHandler(x);
+        }
+        if (hot == null)
+            return;
+        for (BTSNode p = hot; p != genesis; p = p.getParent()) {
+            if (!avlBalanced(p)) {
+                reBalance(p);
+            }
+        }
+    }
+
+    private BTSNode removeHandler(BTSNode node) {
+        BTSNode l = node.getLeft();
+        BTSNode r = node.getRight();
+        BTSNode p = node.getParent();
+        if (l == null && r == null) {
+            if (node.isLeft()) {
+                p.setLeft(null);
+            } else {
+                p.setRight(null);
+            }
+            if (node == getRoot())
+                this.setRoot(null);
+        } else if (l != null && r == null) {
+            if (node == getRoot())
+                this.setRoot(l);
+            else {
+                if (node.isLeft()) {
+                    p.setLeft(l);
+                } else {
+                    p.setRight(l);
+                }
+            }
+            l.setParent(p);
+        } else if (l == null && r != null) {
+            if (node == getRoot())
+                this.setRoot(r);
+            else {
+                if (node.isRight()) {
+                    p.setRight(r);
+                } else {
+                    p.setLeft(r);
+                }
+            }
+            r.setParent(p);
+        } else {
+            BTSNode curr = r;
+            BTSNode remove = null;
+            while (curr != null) {
+                remove = curr;
+                curr = curr.getLeft();
+            }
+            node.setData(remove.getData());
+            removeHandler(remove);
+        }
+        return p;
     }
 
     /**
@@ -252,7 +306,9 @@ class AVL {
         queue.push(root);
         while (!queue.isEmpty()) {
             BTSNode currNode = queue.pollLast();
-            System.out.print(currNode.getData() + "{" + (balanceFactor(currNode)) + "} ");
+            if(currNode == null)
+                break;
+            System.out.print(currNode.getData() + " ");
             BTSNode currLeft = currNode.getLeft();
             BTSNode currRight = currNode.getRight();
 
@@ -355,18 +411,39 @@ class AVL {
     }
 
     public static void main(String[] args) {
+        /////////////////////
+        //平衡二叉树的初始化
+        /////////////////////
         AVL avl = new AVL();
         avl.init(1);
-        for (int i = 1; i < 9; i++) {
+        for (int i = 2; i < 20; i++) {
             avl.insert(i);
         }
-        System.out.println(avl.getSize());
-        long start = System.currentTimeMillis();
-        BTSNode node = avl.search(99999);
-        System.out.println(node);
-        long end = System.currentTimeMillis();
-        System.out.println("Time Consuming:" + (end - start) + " ms");
-
+        //////////////////////
+        //测试搜索耗时
+        /////////////////////
+//        long start = System.currentTimeMillis();
+//        avl.search(10);
+//        long end = System.currentTimeMillis();
+//        System.out.println("Time Consuming:" + (end - start) + " ms");
+        /////////////////////
+        //测试删除
+        ////////////////////
+        avl.remove(1);
+        avl.remove(2);
+        avl.remove(3);
+        avl.remove(4);
+        avl.remove(5);
+        avl.remove(6);
+        avl.remove(7);
+        avl.remove(8);
+        avl.remove(9);
+        /////////////////
+        //进行层次遍历
+        ////////////////
+        avl.inOrderII(avl.getRoot());
+        System.out.println();
         avl.level(avl.getRoot());
+        System.out.println();
     }
 }
