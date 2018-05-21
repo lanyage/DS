@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * 通过递归分置来求解数组的最大子数组
  * 思想:
- * 子向量要么存在于左边,要么存在于右边,要么存在于左边接和右边界之间
+ * 子向量要么存在于左边,要么存在于右边,要么存在于从mid开始向两边扩散的区间
  * 因此可以把问题分而治之
  */
 public class MaxSubArray {
@@ -63,9 +63,9 @@ public class MaxSubArray {
         for (int i = leftMaxIndex; i < rightMaxIndex + 1; i++) {
             crossSum += a[i];
         }
-        if (leftSum > rightSum && leftSum > crossSum) {
+        if (leftSum >= rightSum && leftSum >= crossSum) {
             return new int[]{left[0], left[1]};
-        } else if (rightSum > leftSum && rightSum > crossSum) {
+        } else if (rightSum >= leftSum && rightSum >= crossSum) {
             return new int[]{right[0], right[1]};
         } else {
             return new int[]{leftMaxIndex, rightMaxIndex + 1};
