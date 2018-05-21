@@ -13,46 +13,60 @@ import java.util.Arrays;
  * 因此可以把问题分而治之
  */
 public class MaxSubArray {
-    public int[] findMaxSubArray(int[] a, int l, int r) {
-        if (r - l == 1)
-            return new int[]{l, r};
-        int mid = (l + r) >> 1;
-        int[] leftMaxSubArray = findMaxSubArray(a, l, mid);//左边区间的最大子区间
-        int[] rightMaxSubArray = findMaxSubArray(a, mid, r);//右边区间的最大子区间
-
-        /** 根据左边界和右边界和mid来确认合并的区间是左还是右*/
-        return findMaxCrossArray(a, leftMaxSubArray[0], leftMaxSubArray[1], mid, rightMaxSubArray[0], rightMaxSubArray[1]);
+    public int maxSubArray(int[] nums) {
+        int[] res = maxSub(nums, 0, nums.length);
+        int sum = 0;
+        for(int i = res[0]; i < res[1]; i++) {
+            sum += nums[i];
+        }
+        return sum;
     }
 
-    private int[] findMaxCrossArray(int[] a, int l, int r1, int mid, int l2, int r) {
+    private int[] maxSub(int[] a, int l, int r) {
+        if (r - l == 1) {
+            return new int[]{l, r};
+        }
+
+        int mid = (l + r) / 2;
+        int[] left = maxSub(a, l, mid);
+        int[] right = maxSub(a, mid, r);
+
+        int leftMaxIndex = mid - 1;
         int sum = 0;
-        int leftMax = Integer.MIN_VALUE;
-        int leftMaxIndex = -1;
-        for (int i = r1 - 1; i >= l; i--) {
+        int leftMax = 0;
+        for (int i = mid - 1; i >= l; i--) {
             sum += a[i];
             if (sum > leftMax) {
                 leftMax = sum;
                 leftMaxIndex = i;
             }
         }
+        int rightMaxIndex = mid;
         sum = 0;
-        int rightMax = Integer.MIN_VALUE;
-        int rightMaxIndex = -1;
-        for (int i = l2; i < r; i++) {
+        int rightMax = 0;
+        for (int i = mid; i < r; i++) {
             sum += a[i];
             if (sum > rightMax) {
                 rightMax = sum;
                 rightMaxIndex = i;
             }
         }
-        sum = 0;
-        for (int i = leftMaxIndex; i < rightMaxIndex + 1; i++) {
-            sum += a[i];
+        int leftSum = 0;
+        for (int i = left[0]; i < left[1]; i++) {
+            leftSum += a[i];
         }
-        if (leftMax > sum && leftMax > rightMax) {
-            return new int[]{l, r1};
-        } else if (rightMax > sum && rightMax > leftMax) {
-            return new int[]{l2, r};
+        int rightSum = 0;
+        for (int i = right[0]; i < right[1]; i++) {
+            rightSum += a[i];
+        }
+        int crossSum = 0;
+        for (int i = leftMaxIndex; i < rightMaxIndex + 1; i++) {
+            crossSum += a[i];
+        }
+        if (leftSum > rightSum && leftSum > crossSum) {
+            return new int[]{left[0], left[1]};
+        } else if (rightSum > leftSum && rightSum > crossSum) {
+            return new int[]{right[0], right[1]};
         } else {
             return new int[]{leftMaxIndex, rightMaxIndex + 1};
         }
